@@ -1,0 +1,17 @@
+#!/bin/sh
+
+set -eu
+
+echo "Running Rust formatting checks..."
+cargo fmt --all -- --check
+
+echo "Running Clippy..."
+cargo clippy --all-targets --all-features -- -D warnings
+
+echo "Running tests..."
+cargo test --all-targets
+
+echo "Building release..."
+cargo build --release
+
+echo "All checks passed!"
