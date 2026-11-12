@@ -3,6 +3,14 @@ use std::collections::HashMap;
 use std::fmt::Debug;
 use std::hash::Hash;
 
+/// A least recently used (LRU) cache.
+///
+/// Stores key-value pairs and keeps track of their usage order.
+/// When the cache reaches its capacity, the least recently used
+/// entry is evicted to make room for a new entry.
+///
+/// Internally, it uses a `HashMap` for key lookups and a doubly
+/// linked list to maintain the usage order.
 pub struct LRUCache<K, V> {
     map: HashMap<K, NodeRef<K, V>>,
     doubly_ll: DoublyLL<K, V>,
@@ -14,6 +22,15 @@ where
     K: Eq + Hash + Clone,
     V: Clone,
 {
+    /// Creates a new LRU cache with the specified capacity.
+    ///
+    /// # Arguments
+    /// * `size` - Maximum number of entries the cache can hold.
+    ///
+    /// # Returns
+    /// A new, empty `LRUCache` instance.
+    ///
+    /// A capacity of `0` creates a cache that does not store any entries.
     pub fn new(size: usize) -> Self {
         return Self {
             map: HashMap::new(),
@@ -22,6 +39,17 @@ where
         };
     }
 
+    /// Retrieves the value associated with the given key.
+    ///
+    /// If the key exists, its entry is marked as recently used by
+    /// moving it to the front of the usage list.
+    ///
+    /// # Arguments
+    /// * `key` - Reference to the key whose value should be retrieved.
+    ///
+    /// # Returns
+    /// * `Some(V)` - A clone of the value associated with the key.
+    /// * `None` - If the key does not exist in the cache.
     pub fn get(&mut self, key: &K) -> Option<V> {
         let node = self.map.get(key)?.clone();
         self.doubly_ll.move_to_front(&node);
@@ -30,6 +58,17 @@ where
         return Some(value);
     }
 
+    /// Inserts or updates a key-value pair in the cache.
+    ///
+    /// If the key already exists, its value is updated and the entry
+    /// is marked as recently used.
+    ///
+    /// If the key does not exist and the cache is at capacity,
+    /// the least recently used entry is evicted before insertion.
+    ///
+    /// # Arguments
+    /// * `key` - Key of the entry to insert or update.
+    /// * `value` - Value associated with the key.
     pub fn put(&mut self, key: K, value: V) {
         if self.size == 0 {
             return;
@@ -52,6 +91,13 @@ where
         self.map.insert(key, node);
     }
 
+    /// Prints the current cache entries to standard output.
+    ///
+    /// Entries are printed in usage order, with the most recently
+    /// used entry appearing first.
+    ///
+    /// # Note
+    /// This method requires both keys and values to implement `Debug`.
     pub fn print_cache(&self)
     where
         K: Debug,

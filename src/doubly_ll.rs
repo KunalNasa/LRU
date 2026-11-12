@@ -1,6 +1,11 @@
 use crate::{Node, NodeRef};
 use std::rc::{Rc, Weak};
 
+/// A doubly linked list that maintains references to its first and last nodes.
+///
+/// Each node contains a key-value pair and maintains links to its previous
+/// and next nodes. The list supports efficient insertion, removal, and
+/// reordering of nodes.
 pub struct DoublyLL<K, V> {
     pub head: Option<NodeRef<K, V>>,
     pub tail: Option<NodeRef<K, V>>,
@@ -8,11 +13,15 @@ pub struct DoublyLL<K, V> {
 
 impl<K, V> Default for DoublyLL<K, V> {
     fn default() -> Self {
-        Self::new()
+        return Self::new();
     }
 }
 
 impl<K, V> DoublyLL<K, V> {
+    /// Creates a new empty doubly linked list.
+    ///
+    /// # Returns
+    /// A new `DoublyLL` instance with both `head` and `tail` set to `None`.
     pub fn new() -> Self {
         return Self {
             head: None,
@@ -20,12 +29,29 @@ impl<K, V> DoublyLL<K, V> {
         };
     }
 
+    /// Creates a new node and inserts it at the front of the list.
+    /// The inserted node becomes the new head of the list.
+    ///
+    /// # Arguments
+    /// * `key` - Key to store in the new node.
+    /// * `value` - Value to store in the new node.
+    ///
+    /// # Returns
+    /// A reference-counted pointer to the newly created node.
     pub fn add_to_front(&mut self, key: K, value: V) -> NodeRef<K, V> {
         let new_node = Node::new(key, value);
         self.insert_to_front(new_node.clone());
         return new_node;
     }
 
+    /// Moves an existing node to the front of the list.
+    ///
+    /// If the node is already the head, the list remains unchanged.
+    /// Otherwise, the node is removed from its current position and
+    /// inserted at the front.
+    ///
+    /// # Arguments
+    /// * `node` - Reference to the node that should become the new head.
     pub fn move_to_front(&mut self, node: &NodeRef<K, V>) {
         if let Some(head) = &self.head
             && Rc::ptr_eq(head, node)
@@ -37,6 +63,11 @@ impl<K, V> DoublyLL<K, V> {
         self.insert_to_front(node.clone());
     }
 
+    /// Removes the last node from the list.
+    ///
+    /// # Returns
+    /// * `Some(NodeRef)` - Reference to the removed node.
+    /// * `None` - If the list is empty.
     pub fn remove_last(&mut self) -> Option<NodeRef<K, V>> {
         let node = self.tail.clone()?;
 
@@ -45,6 +76,16 @@ impl<K, V> DoublyLL<K, V> {
         return Some(node);
     }
 
+    /// Converts the linked list into a vector of key-value pairs.
+    ///
+    /// The resulting vector preserves the list's traversal order,
+    /// starting from the head and ending at the tail.
+    ///
+    /// # Returns
+    /// A vector containing cloned key-value pairs in list order.
+    ///
+    /// # Note
+    /// Both `K` and `V` must implement `Clone`.
     pub fn ll_to_array(&self) -> Vec<(K, V)>
     where
         K: Clone,
