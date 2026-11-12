@@ -38,3 +38,9 @@ assert_eq!(cache.get(&"A".to_string()), Some(10));
 cache.put("C".to_string(), 30); // Evicts B
 assert_eq!(cache.get(&"B".to_string()), None);
 ```
+
+## Project Status
+
+This is a learning project built to explore Rust ownership, borrowing, and data structures through implementing an LRU cache from scratch.
+
+**This project is not intended for production use.** It is considered complete for its learning objectives, and there are currently no plans for further development or maintenance.
